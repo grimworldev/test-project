@@ -11,12 +11,19 @@ class PuroksController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $puroks = Puroks::all();
-        return Inertia::render('puroks/index',[
+        $filter = $request->query('filter', 'active');
+        $puroks = match ($filter) {
+            'inactive'  => Puroks::onlyTrashed()->get(),
+            'all'       => Puroks::withTrashed()->get(),
+            default     => Puroks::all(),
+        };
+        // $puroks = Puroks::all();
+        return Inertia::render('puroks/index', [
             'puroks' => $puroks,
+            'filter' => $filter,
         ]);
     }
 
@@ -34,6 +41,15 @@ class PuroksController extends Controller
     public function store(Request $request)
     {
         //
+        $validated = $request->validate([
+            'name' => 'required|string|max:35|unique:puroks,name'
+        ]);
+
+
+        Puroks::create($validated);
+
+        return redirect()->route('puroks.index')->with('sucess', 'Purok created successfully.');
+
     }
 
     /**
@@ -55,16 +71,24 @@ class PuroksController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Puroks $puroks)
+    public function update(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:35|unique:puroks,name,' . $id,
+        ]);
+        $puroks = Puroks::find($id);
+        $puroks->update($validated);
+        return redirect()->route('puroks.index')->with('sucess', 'Purok updated successfully!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Puroks $puroks)
+    public function destroy($id)
     {
-        //
+        $purok = Puroks::find($id);
+        $purok->delete();
+
+        return redirect()->route('puroks.index')->with('success', 'Purok deleted successfully.');
     }
 }

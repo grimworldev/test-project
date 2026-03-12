@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
@@ -11,7 +9,6 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableHeader,
@@ -33,12 +30,14 @@ import {
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  data: TData[];                        
+  onFilterChange: (value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onFilterChange,
 }: DataTableProps<TData, TValue>) {
   const defaultPageSize = Number(localStorage.getItem("rowsPerPage")) || 10;
 
@@ -89,7 +88,6 @@ export function DataTable<TData, TValue>({
 
   const pageCount = table.getPageCount();
 
-  // Smart pagination: shows first, last, current ± 1, with ellipsis
   const getPageNumbers = () => {
     if (pageCount <= 7) return Array.from({ length: pageCount }, (_, i) => i);
 
@@ -113,7 +111,20 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Select onValueChange={onFilterChange}>
+          <SelectTrigger className="w-36 h-8">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Input
         placeholder="Search..."
         value={globalFilter}
@@ -191,7 +202,7 @@ export function DataTable<TData, TValue>({
               <SelectValue placeholder={pageSize.toString()} />
             </SelectTrigger>
             <SelectContent>
-              {[5, 10, 15, 25].map((size) => (  // ✅ Updated pagination values
+              {[5, 10, 15, 25].map((size) => (
                 <SelectItem key={size} value={size.toString()}>
                   {size}
                 </SelectItem>

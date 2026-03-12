@@ -1,33 +1,63 @@
-"use client"
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { router } from "@inertiajs/react";
+import { destroy } from "@/routes/puroks";
 
-import { ColumnDef } from "@tanstack/react-table"
+type Purok = {
+  id: number;
+  name: string;
+};
 
-export type Purok = {
-  id: string,
-  name: string,
-  created_at: string,
-  updated_at: string,
-}
-
-export const columns: ColumnDef<Purok>[] = [
+export const getColumns = (onEdit: (purok: Purok) => void): ColumnDef<Purok>[] => [
   {
-    accessorKey: "id",
-    header: "ID",
+    accessorKey: "name",
+    header: "Name",
   },
   {
     accessorKey: "created_at",
     header: "Date Registered",
   },
   {
-    accessorKey: "name",
-    header: "Purok Name",
+    accessorKey: "updated_at",
+    header: "Date Updated",
   },
   {
-    accessorKey: "updated_at",
-    header: "Date Registered",
+    id: "actions",
+    cell: ({ row }) => {
+      const purok = row.original;
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit(purok)}>
+              <Pencil className="w-4 h-4 mr-2" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-500"
+              onClick={() => {
+                if (confirm(`Are you sure you want to delete "${purok.name}"?`)) {
+                  router.delete(destroy(purok.id)); // 👈 this triggers soft delete
+                }
+              }}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
-  {
-    accessorKey: "updated_at",
-    header: "Date Registered",
-  },
-]
+];

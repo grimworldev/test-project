@@ -1,17 +1,45 @@
 import AppLayout from "@/layouts/app-layout";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { DataTable } from "./data-table";
-import { columns } from './columns';
+import { getColumns } from './columns';
+import Create from "./partials/create";
+import { useState } from "react";
+import { index } from '@/routes/puroks';
 
-export default function index({puroks} : {puroks:any}) {
-    console.log(puroks)
+type Purok = {
+    id: number;
+    name: string;
+};
+
+export default function Index({ puroks }: { puroks: Purok[] }) {
+
+    console.log('test')
+    const [selectedPurok, setSelectedPurok] = useState<Purok | null>(null);
+
+    const columns = getColumns((purok) => setSelectedPurok(purok));
+
+    function handleFilterChange(value: string) {
+        router.get(index(), { filter: value }, { // 👈 Wayfinder route
+            preserveState: true,
+            replace: true,
+        });
+    }
+
+
     return (
         <AppLayout>
-            <Head title="Dashboard" />
+            <Head title="Puroks" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <h1>This is the Puroks Page</h1>
-                <DataTable columns={columns} data={puroks}/>
+                <div className="w-full p-4">
+                    <Create
+                        selectedPurok={selectedPurok}
+                        onClear={() => setSelectedPurok(null)}
+                    />
+                </div>
+                <div className="w-full p-4">
+                    <DataTable columns={columns} data={puroks} onFilterChange={handleFilterChange}/>
+                </div>
             </div>
         </AppLayout>
-    )
+    );
 }
