@@ -16,6 +16,7 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 import puroks from '@/routes/puroks';
+import residents from '@/routes/residents';
 
 const mainNavItems: NavItem[] = [
     {
@@ -26,6 +27,11 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Puroks',
         href: puroks.index(),
+        icon: BookAIcon,
+    },
+    {
+        title: 'Residents',
+        href: residents.index(),
         icon: BookAIcon,
     },
 ];

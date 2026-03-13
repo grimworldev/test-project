@@ -11,7 +11,15 @@ type Purok = {
     name: string;
 };
 
-export default function Index({ puroks }: { puroks: Purok[] }) {
+type Resident = {
+    id: number;
+    uuid: string;
+    purok_id: number;
+    first_name: string;
+    last_name: string;
+};
+
+export default function Index({ puroks, residents }: { puroks: Purok[], residents:Resident[], }) {
 
     const [selectedPurok, setSelectedPurok] = useState<Purok | null>(null);
 
@@ -31,12 +39,13 @@ export default function Index({ puroks }: { puroks: Purok[] }) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="w-full p-4">
                     <Create
+                        puroks={puroks}
                         selectedPurok={selectedPurok}
                         onClear={() => setSelectedPurok(null)}
                     />
                 </div>
                 <div className="w-full p-4">
-                    <DataTable columns={columns} data={puroks} onFilterChange={handleFilterChange}/>
+                    <DataTable columns={columns} data={residents} onFilterChange={handleFilterChange}/>
                 </div>
             </div>
         </AppLayout>

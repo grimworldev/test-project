@@ -1,10 +1,11 @@
-import { Form } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store, update } from '@/routes/puroks';
+import { type User } from '@/types';
 
 type Purok = {
     id: number;
@@ -17,6 +18,10 @@ type Props = {
 };
 
 export default function Create({ selectedPurok, onClear }: Props) {
+
+    // const user = usePage.props.auth.user;
+    const { props } = usePage<{ auth: { user: User } }>();
+    const user = props.auth.user;
     const isEditing = selectedPurok !== null;
 
     const formProps = isEditing
@@ -48,10 +53,12 @@ export default function Create({ selectedPurok, onClear }: Props) {
                     </div>
 
                     <div className="flex gap-2">
+    
                         <Button type="submit" className="w-full" disabled={processing}>
                             {processing && <Spinner />}
                             {isEditing ? 'Update Purok' : 'Save Purok'}
                         </Button>
+
                         {isEditing && (
                             <Button type="button" variant="outline" onClick={onClear}>
                                 Cancel
